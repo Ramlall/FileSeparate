@@ -47,6 +47,8 @@ namespace FileOps
 				{
 					if (line[w] == ':' && line[w + 1] == ' ')
 					{
+						paths.Write("List.Add(\"");
+						values.Write("List.Add(\"");
 						for (int k = 0; k < w; k++)
 						{
 							paths.Write(line[k]);
@@ -55,14 +57,18 @@ namespace FileOps
 						{
 							values.Write(line[m]);
 						}
-						paths.WriteLine();
-						values.WriteLine();
+						paths.WriteLine("\")");
+						values.WriteLine("\")");
 						break;
 					}
 
 					// If we get to the end of a non-blank line.
 					if (w == line.Count() - 1)
 					{
+						if (line[0] != '/')
+						{
+							paths.Write("List.Add(\"");
+						}
 						for (int n = 0; n < line.Count(); n++)
 						{
 							paths.Write(line[n]);
@@ -74,7 +80,10 @@ namespace FileOps
 								values.Write(line[h]);
 							}
 						}
-
+						if (line[0] != '/')
+						{
+							paths.WriteLine("\")");
+						}
 						values.WriteLine();
 						paths.WriteLine();
 						break;
@@ -88,3 +97,4 @@ namespace FileOps
 		}
 	}
 }
+
