@@ -47,8 +47,8 @@ namespace FileOps
 				{
 					if (line[w] == ':' && line[w + 1] == ' ')
 					{
-						paths.Write("List.Add(\"");
-						values.Write("List.Add(\"");
+						paths.Write("tempList.Add(\"");
+						values.Write("tempList.Add(\"");
 						for (int k = 0; k < w; k++)
 						{
 							paths.Write(line[k]);
@@ -57,8 +57,8 @@ namespace FileOps
 						{
 							values.Write(line[m]);
 						}
-						paths.WriteLine("\")");
-						values.WriteLine("\")");
+						paths.WriteLine("\");");
+						values.WriteLine("\");");
 						break;
 					}
 
@@ -67,7 +67,7 @@ namespace FileOps
 					{
 						if (line[0] != '/')
 						{
-							paths.Write("List.Add(\"");
+							paths.Write("tempList.Add(\"");
 						}
 						for (int n = 0; n < line.Count(); n++)
 						{
@@ -82,7 +82,7 @@ namespace FileOps
 						}
 						if (line[0] != '/')
 						{
-							paths.WriteLine("\")");
+							paths.Write("\");");
 						}
 						values.WriteLine();
 						paths.WriteLine();
@@ -97,4 +97,3 @@ namespace FileOps
 		}
 	}
 }
-
