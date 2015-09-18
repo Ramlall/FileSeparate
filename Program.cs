@@ -19,17 +19,21 @@ namespace FileOps
 	    {
 		static void Main(string[] args)
 		    {
-            // Create an empty string for which line we're on. We'll use this to read the lines later.
-			string line;
+            // Tell the user what's up.
+            System.Console.WriteLine("We're about to separate your text file of registry info.");
+            System.Console.WriteLine("Make sure the file is called input.txt and is in the working directory.");
 
-			// Define our input file and output files and their locations, and their variable names.
-			StreamReader input = new System.IO.StreamReader(@"c:\work\FileSeparate\input.txt");
-			StreamWriter paths = new StreamWriter(@"c:\work\FileSeparate\justpaths.txt");
-            StreamWriter valuenames = new StreamWriter(@"c:\work\FileSeparate\justvaluenames.txt");
-            StreamWriter values = new StreamWriter(@"c:\work\FileSeparate\justvalues.txt");
+            // Create an empty string for which line we're on. We'll use this to read the lines later.
+            string line;
+
+            // Define our input file and output files and their locations, and their variable names.
+            StreamReader input = new StreamReader("input.txt");
+            StreamWriter paths = new StreamWriter("justpaths.txt");
+            StreamWriter valuenames = new StreamWriter("justvaluenames.txt");
+            StreamWriter values = new StreamWriter("justvalues.txt");
 
             // This tells us which line of the file we're on. 
-			int lineCount = File.ReadLines(@"c:\work\FileSeparate\input.txt").Count();
+			int lineCount = File.ReadLines("input.txt").Count();
 
             // Scrolling through all the lines in the file.
 			for (int d = 0; d < lineCount; d++)
@@ -155,6 +159,8 @@ namespace FileOps
 			paths.Close();
             valuenames.Close();
 			values.Close();
+
+            System.Console.ReadKey();
 		    }
 	    }
     }
