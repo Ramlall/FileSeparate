@@ -2,8 +2,8 @@
 // General Advertising ID KEYS ADDED
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-tempList.Add("HKU\S-1-5-21-2520449646-63790241-3527182363-1001\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\OpenSavePidlMRU\hiv");
-tempList.Add("HKU\S-1-5-21-2520449646-63790241-3527182363-1001\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.hiv");
+tempList.Add(@"HKU\S-1-5-21-2520449646-63790241-3527182363-1001\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\OpenSavePidlMRU\hiv");
+tempList.Add(@"HKU\S-1-5-21-2520449646-63790241-3527182363-1001\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.hiv");
 
-tempList.Add("HKU\S-1-5-21-2520449646-63790241-3527182363-1001\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\LastVisitedPidlMRU\2");
-tempList.Add("HKU\S-1-5-21-2520449646-63790241-3527182363-1001\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\OpenSavePidlMRU\*\2");
+tempList.Add(@"HKU\S-1-5-21-2520449646-63790241-3527182363-1001\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\LastVisitedPidlMRU\");
+tempList.Add(@"HKU\S-1-5-21-2520449646-63790241-3527182363-1001\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\OpenSavePidlMRU\*\");
