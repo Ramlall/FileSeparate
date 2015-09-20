@@ -20,8 +20,11 @@ namespace FileOps
 		static void Main(string[] args)
 		    {
             // Tell the user what's up.
-            System.Console.WriteLine("We're about to separate your text file of registry info.");
-            System.Console.WriteLine("Make sure the file is called input.txt and is in the working directory.");
+            Console.WriteLine("We're about to separate your text file of registry info.");
+            Console.WriteLine("Processing the input.txt file. Please wait, this will probably take a while.");
+            Console.WriteLine("When this black box disappears the program is completed.");
+            Console.WriteLine("Wait only until the program is completed to close this window.");
+            Console.WriteLine("If you close the window early then the five files generated won't be complete.");
 
             // Create an empty string for which line we're on. We'll use this to read the lines later.
             string line;
@@ -31,6 +34,7 @@ namespace FileOps
             StreamWriter paths = new StreamWriter("justpaths.txt");
             StreamWriter valuenames = new StreamWriter("justvaluenames.txt");
             StreamWriter values = new StreamWriter("justvalues.txt");
+            StreamWriter valuekinds = new StreamWriter("justvaluekinds.txt");
             StreamWriter parentKeys = new StreamWriter("justparentkeys.txt");
 
             // This tells us which line of the file we're on. 
@@ -48,6 +52,7 @@ namespace FileOps
 					paths.WriteLine();
                     valuenames.WriteLine();
 					values.WriteLine();
+                    valuekinds.WriteLine();
                     parentKeys.WriteLine();
                     continue;
 				    }
@@ -63,6 +68,7 @@ namespace FileOps
 						paths.Write("tempList.Add(@\"");
                         valuenames.Write("tempList.Add(\"");
                         values.Write("tempList.Add(\"");
+                        valuekinds.Write("tempList.Add(\"");
                         parentKeys.Write("tempList.Add(");
 
                         // Now we need to find where the path ends and the value begins.
@@ -112,16 +118,73 @@ namespace FileOps
                             {
                             valuenames.Write(line[p]);
                             }
-                        // Write to the "values" output file everything after the space.
+
+                        // "Value" Processing@@@@@@@@@@@@@@@@@@@@@
+                        // Write the "values" to a string so we can process it.
+                        string valueUnModified = "";
                         for (int m = w + 2; m < line.Count(); m++)
 						    {
-							values.Write(line[m]);
+                            valueUnModified = valueUnModified + line[m];
 						    }
+                        // So now valueUnModified is a string of the value.
+                        // Let's process it to determine the type of value it is (binary, string, or DWord)
+                        
+                        // If it starts with a quotation mark then it's a string.
+                        if (valueUnModified[0] == '"')
+                            {
+                            // Write the valueKind as String to the output file
+                            valuekinds.Write("RegistryValueKind.String");
+                            // We can just write the string itself.
+                            values.Write(valueUnModified);
+                            }
+                        // If the second character is an x then it's DWord
+                        else if (valueUnModified[1] == 'x')
+                            {
+                            // Write the valueKind as DWord to the output file
+                            valuekinds.Write("RegistryValueKind.DWord");
+                            // We can just write the string itself for DWord
+                            values.Write(valueUnModified);
+                            }
+                        // Otherwise it's just binary.
+                        else
+                            {
+                            // Write the valueKind as Binary to the output file
+                            valuekinds.Write("RegistryValueKind.Binary");
 
-                        // Close up our AddToList framework.
-						paths.WriteLine("\");");
+                            // Our valueUnModified looks like "20 3F FF" currently.
+                            // It has to look like   new byte[] { 0x20, 0x3F, 0xFF }    when we're done
+
+                            // Make a new string
+                            string valueModified = "newbyte[] {";
+                            
+                            // Go through the unmodified string adding in the numbers.
+                            for (int k = 0; k < valueUnModified.Count() ;  )
+                                {
+                                // Add 0x##,
+                                valueModified = valueModified + "0x" + valueUnModified[k] + valueUnModified[k+1];
+                                // Our next stop is 3 spots ahead. (That is, skip the 2 numbers we just processed + the blank space)
+                                k = k + 3;
+
+                                // If we have more numbers to process then add a ", "
+                                if (k < valueUnModified.Count() )
+                                    {
+                                    valueModified = valueModified + ", ";
+                                    }
+                                }
+
+                            // Close it up.
+                            valueModified = valueModified + "}";
+                            // Write the modified string to our values output file.
+                            values.Write(valueModified);
+                            }
+
+                        // END OF VALUE PROCESSING @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+                        // Close up our framework for adding to the temp list.
+                        paths.WriteLine("\");");
                         valuenames.WriteLine("\");");
                         values.WriteLine("\");");
+                        valuekinds.WriteLine("\");");
                         parentKeys.WriteLine(");");
                         break;
 					    }
@@ -177,14 +240,16 @@ namespace FileOps
                                 paths.Write(line[h]);
                                 values.Write(line[h]);
                                 valuenames.Write(line[h]);
+                                valuekinds.Write(line[h]);
                                 parentKeys.Write(line[h]);
                                 }
                             }
                         
                         // Go to the next line.
 						values.WriteLine();
-                        valuenames.WriteLine();
+                        valuekinds.WriteLine();
 						paths.WriteLine();
+                        paths.WriteLine();
                         parentKeys.WriteLine();
 						break;
 					    }
@@ -195,6 +260,7 @@ namespace FileOps
 			paths.Close();
             valuenames.Close();
 			values.Close();
+            valuekinds.Close();
             parentKeys.Close();
 
 		    }
