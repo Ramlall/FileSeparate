@@ -31,9 +31,10 @@ namespace FileOps
             StreamWriter paths = new StreamWriter("justpaths.txt");
             StreamWriter valuenames = new StreamWriter("justvaluenames.txt");
             StreamWriter values = new StreamWriter("justvalues.txt");
+            StreamWriter parentKeys = new StreamWriter("justparentkeys.txt");
 
             // This tells us which line of the file we're on. 
-			int lineCount = File.ReadLines("input.txt").Count();
+            int lineCount = File.ReadLines("input.txt").Count();
 
             // Scrolling through all the lines in the file.
 			for (int d = 0; d < lineCount; d++)
@@ -47,17 +48,8 @@ namespace FileOps
 					paths.WriteLine();
                     valuenames.WriteLine();
 					values.WriteLine();
-					continue;
-				    }
-
-                // HKLM lines are very long and take a long time to process programatically. There are few enough of them
-                // that we'll manually type in the info, other wise the program running time will be high and we'll be waiting.
-                if (line.Count() >= 3 && line[0] == 'H' && line[1] == 'K' && line[2] == 'L' && line[3] == 'M')
-				    {
-					paths.WriteLine("HEYYYYY OVER HERE. This was an HKLM line and it was too long to process. Do this one manually yourself! In the input it's line {0}!", d);
-                    valuenames.WriteLine("HEYYYYY OVER HERE. This was an HKLM line and it was too long to process. Do this one manually yourself! In the input it's line {0}!", d);
-                    values.WriteLine("HEYYYYY OVER HERE. This was an HKLM line and it was too long to process. Do this one manually yourself! In the input it's line {0}!", d);
-					continue;
+                    parentKeys.WriteLine();
+                    continue;
 				    }
 
                 // Check if the line is a value to be modified. If so we need to seperate the string into pieces.
@@ -71,6 +63,7 @@ namespace FileOps
 						paths.Write("tempList.Add(@\"");
                         valuenames.Write("tempList.Add(\"");
                         values.Write("tempList.Add(\"");
+                        parentKeys.Write("tempList.Add(");
 
                         // Now we need to find where the path ends and the value begins.
                         int h;
@@ -83,12 +76,37 @@ namespace FileOps
                                 break;
                                 }
                             }
+                        
+                        // Handle if it's an HKU
+                        if (line[0] == 'H' && line[1] == 'K' && line[2] == 'U')
+                            {
+                            // Then the paths starts at a different place & our parentKey is different.
 
-                        // Write to the "paths" output file the beginning of the string. 
-						for (int k = 0; k <= h; k++) // Will go from HKU\Whatever\    and then value name is left out.
-						    {
-							paths.Write(line[k]);
-						    }
+                            // Set the parentKey to Users.
+                            parentKeys.Write("Registry.Users");
+
+                            // Write to the "paths" output file the subkey.
+                            for (int k = 4; k <= h; k++) // Will go from HKU\Whatever\    and then value name is left out.
+                                {
+                                paths.Write(line[k]);
+                                }
+                            }
+
+                        // Handle if it's an HKLM
+                        if (line[0] == 'H' && line[1] == 'K' && line[2] == 'L' && line[3] == 'M')
+                            {
+                            // Then the paths starts at a different place & our parentKey is different.
+
+                            // Set the parentKey to Users.
+                            parentKeys.Write("Registry.LocalMachine");
+
+                            // Write to the "paths" output file the subkey.
+                            for (int k = 5; k <= h; k++) // Will go from HKU\Whatever\    and then value name is left out.
+                                {
+                                paths.Write(line[k]);
+                                }
+                            }
+
                         // Write to the "valuenames" output file everything after the space.
                         for (int p = h+1; p < w; p++) // Go from the first char after \ to the semicolon
                             {
@@ -99,14 +117,16 @@ namespace FileOps
 						    {
 							values.Write(line[m]);
 						    }
+
                         // Close up our AddToList framework.
 						paths.WriteLine("\");");
                         valuenames.WriteLine("\");");
                         values.WriteLine("\");");
-						break;
+                        parentKeys.WriteLine(");");
+                        break;
 					    }
 
-                    // If we get to the end of a non-blank line. 
+                    // If we get to the end of a non-blank line that isn't a value. (It could be a key to be added)
                     // We handle organizational lines and Keys to be Added paths here since they're very simple. 
                     if (w == line.Count() - 1)
 					    {
@@ -116,33 +136,48 @@ namespace FileOps
 						    {
                             // Setup the list format for the path of the string (for the key to be added)
 							paths.Write("tempList.Add(@\"");
-						    }
-                        // Write everything from that line into our string for our list in the Paths file. This isn't part
-                        // of the if Block because we write the contents to the path file regardless of what it is.
-                        for (int n = 0; n < line.Count(); n++)
-						    {
-							paths.Write(line[n]);
-						    }
-                        // Now we can close up our adding to the list format for the Path.
-                        if (line[0] != '/')
-                            {
+                            parentKeys.Write("tempList.Add(");
+
+                            // If it's HKU
+                            if (line[0] == 'H' && line[1] == 'K' && line[2] == 'U')
+                                {
+                                // Write the parentkey to parentkey file.
+                                parentKeys.Write("Registry.Users");
+
+                                // Write to paths starting from a different index.
+                                for (int n = 4; n < line.Count(); n++)
+                                    {
+                                    paths.Write(line[n]);
+                                    }
+                                }
+                            // If it's HKLM
+                            if (line[0] == 'H' && line[1] == 'K' && line[2] == 'L' && line[3] == 'M')
+                                {
+                                // Write the parentkey to parentkey file.
+                                parentKeys.Write("Registry.LocalMachine");
+
+                                // Write to paths starting from a different index.
+                                for (int n = 5; n < line.Count(); n++)
+                                    {
+                                    paths.Write(line[n]);
+                                    }
+                                }
+
+                            // Now we can close up our adding to the list format for the Path.
                             paths.Write("\");");
+                            parentKeys.WriteLine(");");
                             }
 
                         // If the beginning of the line is a comment, we'll also add it to the Values and ValueNames
                         // file for the sake of organization and keeping line numbers consistent.
                         if (line[0] == '/')
-						    {
-							for (int h = 0; h < line.Count(); h++)
-							    {
-								values.Write(line[h]);
-							    }
-						    }
-                        if (line[0] == '/')
                             {
                             for (int h = 0; h < line.Count(); h++)
                                 {
+                                paths.Write(line[h]);
+                                values.Write(line[h]);
                                 valuenames.Write(line[h]);
+                                parentKeys.Write(line[h]);
                                 }
                             }
                         
@@ -150,6 +185,7 @@ namespace FileOps
 						values.WriteLine();
                         valuenames.WriteLine();
 						paths.WriteLine();
+                        parentKeys.WriteLine();
 						break;
 					    }
 				    }
@@ -159,8 +195,8 @@ namespace FileOps
 			paths.Close();
             valuenames.Close();
 			values.Close();
+            parentKeys.Close();
 
-            System.Console.ReadKey();
 		    }
 	    }
     }
