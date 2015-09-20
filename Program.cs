@@ -67,8 +67,8 @@ namespace FileOps
                         // To the output files start by setting up the frame for adding to a list called tempList.
 						paths.Write("tempList.Add(@\"");
                         valuenames.Write("tempList.Add(\"");
-                        values.Write("tempList.Add(\"");
-                        valuekinds.Write("tempList.Add(\"");
+                        values.Write("tempList.Add(");
+                        valuekinds.Write("tempList.Add(");
                         parentKeys.Write("tempList.Add(");
 
                         // Now we need to find where the path ends and the value begins.
@@ -183,8 +183,8 @@ namespace FileOps
                         // Close up our framework for adding to the temp list.
                         paths.WriteLine("\");");
                         valuenames.WriteLine("\");");
-                        values.WriteLine("\");");
-                        valuekinds.WriteLine("\");");
+                        values.WriteLine(");");
+                        valuekinds.WriteLine(");");
                         parentKeys.WriteLine(");");
                         break;
 					    }
@@ -228,9 +228,10 @@ namespace FileOps
 
                             // Now we can close up our adding to the list format for the Path.
                             paths.Write("\");");
-                            parentKeys.WriteLine(");");
+                            parentKeys.Write(");");
                             }
 
+                        
                         // If the beginning of the line is a comment, we'll also add it to the Values and ValueNames
                         // file for the sake of organization and keeping line numbers consistent.
                         if (line[0] == '/')
@@ -249,7 +250,7 @@ namespace FileOps
 						values.WriteLine();
                         valuekinds.WriteLine();
 						paths.WriteLine();
-                        paths.WriteLine();
+                        valuenames.WriteLine();
                         parentKeys.WriteLine();
 						break;
 					    }
