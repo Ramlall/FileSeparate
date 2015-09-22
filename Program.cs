@@ -43,6 +43,9 @@ namespace FileOps
             // Scrolling through all the lines in the file.
 			for (int d = 0; d < lineCount; d++)
 			    {
+                // Write the current line to the system.
+                System.Console.WriteLine("We're on line number {0}", d+1);
+
                 // Read the input line and store it in the variable called "line"
 				line = input.ReadLine();
 
@@ -56,9 +59,9 @@ namespace FileOps
                     parentKeys.WriteLine();
                     continue;
 				    }
-
+                
                 // Check if the line is a value to be modified. If so we need to seperate the string into pieces.
-				for (int w = 0; w < line.Count(); w++)
+                for (int w = 0; w < line.Count(); w++)
 				    {
                     // We know it's a value modified because there's a semicolon followed by a space.
                     // We need to specify the space too because some registry paths have a semicolon in the string.
@@ -136,6 +139,24 @@ namespace FileOps
                             valuekinds.Write("RegistryValueKind.String");
                             // We can just write the string itself.
                             values.Write(valueUnModified);
+                            }
+                        // If it starts with a ' then it's a Multistring. 
+                        // '1,http: 1,file: 1,ftp: 1,mailto: 1,news: "1,//www." 1,www. 2,windows'
+                        // new string[] { "One", "Two", "Three" }
+                        else if (valueUnModified[0] == '\'')
+                            {
+                            // Write the valueKind as String to the output file
+                            valuekinds.Write("RegistryValueKind.MultiString");
+                            values.Write("new string[] { \"");
+                            // Go through the string and every time there's a space separate it.
+                            for (int k = 1; k < valueUnModified.Count() - 1; k++) // Go from the char after ' to the one before the last '
+                                {
+                                if (valueUnModified[k] != ' ')
+                                    { values.Write(valueUnModified[k]); }
+                                else
+                                    { values.Write("\", \""); }
+                                }
+                                values.Write("\" }");
                             }
                         // If the second character is an x then it's DWord
                         else if (valueUnModified[1] == 'x')
