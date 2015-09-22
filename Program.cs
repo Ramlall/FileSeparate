@@ -176,7 +176,7 @@ namespace FileOps
                             // It has to look like   new byte[] { 0x20, 0x3F, 0xFF }    when we're done
 
                             // Make a new string
-                            string valueModified = "newbyte[] {";
+                            string valueModified = "new byte[] {";
                             
                             // Go through the unmodified string adding in the numbers.
                             for (int k = 0; k < valueUnModified.Count() ;  )
