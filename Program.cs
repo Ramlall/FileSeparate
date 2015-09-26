@@ -166,6 +166,14 @@ namespace FileOps
                             // We can just write the string itself for DWord
                             values.Write(valueUnModified);
                             }
+						// If the word is (NULL!) then it's null.
+						else if (valueUnModified[0] == '(' && valueUnModified[5] == '!' && valueUnModified[6] == ')')
+							{
+							// Value kind is string.
+							valuekinds.Write("RegistryValueKind.String");
+							// We can just write the keyword "null"
+							values.Write("null");
+							}
                         // Otherwise it's just binary.
                         else
                             {
