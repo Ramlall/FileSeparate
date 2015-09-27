@@ -137,8 +137,18 @@ namespace FileOps
                             {
                             // Write the valueKind as String to the output file
                             valuekinds.Write("RegistryValueKind.String");
-                            // We can just write the string itself.
-                            values.Write(valueUnModified);
+
+							// In case it's a string that's a location we need to handle \ to make them \\.
+							string valueModified = "";
+							for (int k = 0; k < valueUnModified.Count() - 1; k++)
+								{
+								valueModified = valueModified + valueUnModified[k];
+								if(valueUnModified[k] == '\\')
+									{ valueModified = valueModified + "\\"; }
+								}
+                            
+							// Write the new modified value to a file.
+                            values.Write(valueModified);
                             }
                         // If it starts with a ' then it's a Multistring. 
                         // '1,http: 1,file: 1,ftp: 1,mailto: 1,news: "1,//www." 1,www. 2,windows'
