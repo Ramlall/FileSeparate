@@ -19,6 +19,7 @@ namespace FileOps
 	    {
 		static void Main(string[] args)
 		    {
+			// @@@@@@@@@@@@@@@@@@ INTRODUCTION @@@@@@@@@@@@@@@@@@@@@@
             // Tell the user what's up.
             Console.WriteLine("We're about to separate your text file of registry info.");
             Console.WriteLine("Processing the input.txt file. Please wait, this will probably take a while.");
@@ -26,9 +27,9 @@ namespace FileOps
             Console.WriteLine("Wait only until the program is completed to close this window.");
             Console.WriteLine("If you close the window early then the five files generated won't be complete.");
 
-            // Create an empty string for which line we're on. We'll use this to read the lines later.
-            string line;
+			//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+			// @@@@@@@@@@@@@@@@@@@ FILE HANDLING @@@@@@@@@@@@@@@@@@@@@@@
             // Define our input file and output files and their locations, and their variable names.
             StreamReader input = new StreamReader("input.txt");
             StreamWriter paths = new StreamWriter("justpaths.txt");
@@ -36,6 +37,11 @@ namespace FileOps
             StreamWriter values = new StreamWriter("justvalues.txt");
             StreamWriter valuekinds = new StreamWriter("justvaluekinds.txt");
             StreamWriter parentKeys = new StreamWriter("justparentkeys.txt");
+			// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+			// @@@@@@@@@@@@@@@@@@@@@@@@@@@ READ THE INPUT @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+			// Create an empty string for which line we're on. We'll use this to read the lines later.
+			string line;
 
             // This tells us which line of the file we're on. 
             int lineCount = File.ReadLines("input.txt").Count();
@@ -43,12 +49,15 @@ namespace FileOps
             // Scrolling through all the lines in the file.
 			for (int d = 0; d < lineCount; d++)
 			    {
-                // Write the current line to the system.
+                // Write the current line to the console so we can see where we're at while running the program.
                 System.Console.WriteLine("We're on line number {0}", d+1);
 
                 // Read the input line and store it in the variable called "line"
 				line = input.ReadLine();
 
+				// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+				// @@@@@@@@@@@@@@@@@@@@ BLANK LINES @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 				// If it's a blank line then put a blank line in our output files so the numbers of the lines all match up.
 				if (line.Count() == 0)
 				    {
@@ -59,7 +68,9 @@ namespace FileOps
                     parentKeys.WriteLine();
                     continue;
 				    }
+				// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 
+				// @@@@@@@@@@@@@@@@@@@@@@@@@@ VALUE LINES @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 // Check if the line is a value to be modified. If so we need to seperate the string into pieces.
                 for (int w = 0; w < line.Count(); w++)
 				    {
@@ -74,8 +85,10 @@ namespace FileOps
                         valuekinds.Write("tempList.Add(");
                         parentKeys.Write("tempList.Add(");
 
+						// Check if there's a :\ in the path, because if there is then that's probably a path and we don't want to include it.
+
                         // Now we need to find where the path ends and the value begins.
-                        int h;
+                        int h; 
                         // Starting at the semicolon that separates the path from the value,
                         for (h=w; w > 0; h--)
                             {
@@ -85,12 +98,12 @@ namespace FileOps
                                 break;
                                 }
                             }
+						// h is now the index of the first \ left of where the value begins. 
                         
+						// @@@@@@@@@@@@@@@@@@ HANDLES PARENT KEYS @@@@@@@@@@@@@@@@@@@@@@@@@@@
                         // Handle if it's an HKU
                         if (line[0] == 'H' && line[1] == 'K' && line[2] == 'U')
                             {
-                            // Then the paths starts at a different place & our parentKey is different.
-
                             // Set the parentKey to Users.
                             parentKeys.Write("Registry.Users");
 
@@ -104,8 +117,6 @@ namespace FileOps
                         // Handle if it's an HKLM
                         if (line[0] == 'H' && line[1] == 'K' && line[2] == 'L' && line[3] == 'M')
                             {
-                            // Then the paths starts at a different place & our parentKey is different.
-
                             // Set the parentKey to Users.
                             parentKeys.Write("Registry.LocalMachine");
 
@@ -115,6 +126,8 @@ namespace FileOps
                                 paths.Write(line[k]);
                                 }
                             }
+						// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 
                         // Write to the "valuenames" output file everything after the space.
                         for (int p = h+1; p < w; p++) // Go from the first char after \ to the semicolon
@@ -217,8 +230,6 @@ namespace FileOps
                             values.Write(valueModified);
                             }
 
-                        // END OF VALUE PROCESSING @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
                         // Close up our framework for adding to the temp list.
                         paths.WriteLine("\");");
                         valuenames.WriteLine("\");");
@@ -228,6 +239,10 @@ namespace FileOps
                         break;
 					    }
 
+					// @@@@@@@@@@@@@@@@@@@@@@ END OF VALUE PROCESSING @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+					// @@@@@@@@@@@@@@@@@@@@@@ KEYS and // LINES @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                     // If we get to the end of a non-blank line that isn't a value. (It could be a key to be added)
                     // We handle organizational lines and Keys to be Added paths here since they're very simple. 
                     if (w == line.Count() - 1)
@@ -296,13 +311,17 @@ namespace FileOps
 				    }
 			    }
 
+			// @@@@@@@@@@@@@@@@@@ END OF KEYS AND // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+			// @@@@@@@@@@@@@@@@@@@@@@@ CLOSE FILES @@@@@@@@@@@@@@@@@@
 			input.Close();
 			paths.Close();
             valuenames.Close();
 			values.Close();
             valuekinds.Close();
             parentKeys.Close();
-
+			// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 		    }
 	    }
     }
